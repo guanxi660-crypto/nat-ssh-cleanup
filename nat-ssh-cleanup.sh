@@ -1969,7 +1969,7 @@ main() {
   exit 0
 }
 
-# 仅在直接执行时运行 main（被 source 时只暴露函数，便于单元测试）
-if [[ "${BASH_SOURCE[0]}" == "$0" ]]; then
+# 仅在直接执行时运行 main（被 source / bash -c 时只暴露函数，便于单元测试）
+if [[ "${BASH_SOURCE[0]:-$0}" == "$0" ]]; then
   main "$@"
 fi
