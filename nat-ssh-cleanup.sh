@@ -464,10 +464,20 @@ check_sshd_config() {
     local df
     while IFS= read -r df; do
       [[ -z "$df" ]] && continue
-      if grep -qiE '^[[:space:]]*(AuthorizedKeysCommand|AuthorizedKeysFile|ForceCommand)' "$df"; then
+      # 跳过本脚本自己生成的加固文件
+      [[ "$(basename "$df")" == "99-incident-hardening.conf" ]] && continue
+      # AuthorizedKeysCommand none / AuthorizedKeysFile .ssh/authorized_keys 是安全值，不报
+      if grep -qiE '^[[:space:]]*ForceCommand' "$df"; then
         find_add HIGH SSH-CFG-003 "sshd drop-in 含高风险指令" \
-          "$df: $(grep -iE '^[[:space:]]*(AuthorizedKeysCommand|AuthorizedKeysFile|ForceCommand)' "$df" | head -2 | tr '\n' ' ')"
+          "$df: $(grep -iE '^[[:space:]]*ForceCommand' "$df" | head -2 | tr '\n' ' ')"
       fi
+      local akc akf
+      akc=$(grep -iE '^[[:space:]]*AuthorizedKeysCommand' "$df" | awk '{print $2}')
+      akf=$(grep -iE '^[[:space:]]*AuthorizedKeysFile' "$df" | awk '{print $2}')
+      [[ -n "$akc" && "$akc" != "none" ]] && \
+        find_add HIGH SSH-CFG-003 "sshd drop-in 含高风险指令" "$df: AuthorizedKeysCommand $akc"
+      [[ -n "$akf" && "$akf" != ".ssh/authorized_keys" && "$akf" != "%h/.ssh/authorized_keys" ]] && \
+        find_add HIGH SSH-CFG-003 "sshd drop-in 含高风险指令" "$df: AuthorizedKeysFile $akf"
     done < <(ls "$dd"/*.conf 2>/dev/null)
   fi
 
