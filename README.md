@@ -261,7 +261,7 @@ bash /root/nat-ssh-cleanup.sh --uninstall
 脚本能清掉文件，但清不掉已经泄露的东西：
 
 1. **轮换所有 SSH 密钥**。攻击者已经能读文件，你机器上的私钥、`~/.ssh/id_*`、部署用的 key 全部当作已泄露。
-2. **改密码**，包括 root 和所有业务账号，以及容器里配的任何 API Token、数据库口令。脚本不会替你改，密码登录设置（`PermitRootLogin` / `PasswordAuthentication`）也完全不动，由你自己决定。
+2. **去你的云平台面板改 root 密码**。脚本不会替你改密码，密码登录设置（`PermitRootLogin` / `PasswordAuthentication`）也完全不动——删掉的是公钥后门，你的密码登录不受影响，改密码请到平台面板操作。
 3. **重载 sshd** 让加固生效（脚本会提示具体命令，Debian/Ubuntu 容器通常是 `systemctl reload ssh`，Alpine 是 `rc-service sshd reload`）。
 4. **复查**：`bash /root/nat-ssh-cleanup.sh --verify`。
 5. 如果容器里跑的是业务服务，**评估是否需要重建容器**。清理只能处理已知的落地点，rootkit 和内存马不在这个脚本的覆盖范围内 —— 拿不准就重建。

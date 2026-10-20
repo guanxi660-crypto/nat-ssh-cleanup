@@ -1482,7 +1482,7 @@ menu_apply() {
 
   if [[ ${#ALLOW_FPS[@]} -eq 0 ]]; then
     warn "你一把都没选，authorized_keys 会被清空"
-    warn "当前是容器终端，不会断线；但之后想用 SSH 进来就没门了"
+    warn "当前是容器终端，不会断线；密码登录不受影响，你还能用密码 SSH 进来"
     confirm "确认清空？" || { echo "已取消"; return 0; }
     FORCE=1
   fi
@@ -1494,7 +1494,7 @@ menu_apply() {
     printf '%s以下文件里的公钥全部不在白名单，清理后会变空：%s\n' "$C_YLW" "$C_RST"
     local ef
     for ef in "${EMPTY_FILES[@]}"; do printf '  %s\n' "$ef"; done
-    printf '%s  这意味着该账号之后不能再用 SSH 登录（容器终端不受影响）%s\n' "$C_DIM" "$C_RST"
+    printf '%s  这意味着该账号之后不能用公钥 SSH 登录（容器终端不受影响，密码登录也不受影响）%s\n' "$C_DIM" "$C_RST"
     if confirm "把这些文件也清空？"; then
       for ef in "${EMPTY_FILES[@]}"; do ALLOW_EMPTY_FILES[$ef]=1; done
       ok "已授权清空 ${#EMPTY_FILES[@]} 个文件"
@@ -1590,7 +1590,7 @@ menu_apply() {
   echo
   printf '%s强烈建议接下来做的事：%s\n' "$C_BLD" "$C_RST"
   printf '  1. 轮换所有 SSH 密钥 —— 攻击者已经能读文件，私钥当已泄露\n'
-  printf '  2. 改掉容器里所有账号密码和 API Token\n'
+  printf '  2. 去你的云平台面板改 root 密码（脚本不替你改，密码登录设置也没动）\n'
   printf '  3. 用 [4] 定时巡逻，防止入口没堵住、坏公钥又被写回来\n'
 }
 
@@ -1958,7 +1958,7 @@ main() {
     printf '下一步：\n'
     printf '  1. 先确认你的公钥指纹，然后执行 --apply --allow-pubkey <文件>\n'
     printf '  2. 装定时巡逻兜底：%s --install-watchdog 5\n' "$PROG"
-    printf '  3. 轮换所有 SSH 密钥与 API Token\n'
+    printf '  3. 去云平台面板改 root 密钥与密码\n'
     exit 1
   fi
   if has_sev HIGH; then
