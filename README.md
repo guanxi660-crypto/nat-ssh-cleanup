@@ -41,12 +41,6 @@ bash -c "$(curl -fsSL https://raw.githubusercontent.com/guanxi660-crypto/nat-ssh
 
 **正常流程就是 `1` → 看报告 → `2` → 按提示选自己的公钥 → 确认 → `4` 装定时巡逻。**
 
-如果上面的命令下载失败（国内访问 raw.githubusercontent 不稳），用这条备选：
-
-```bash
-curl -fsSL https://raw.githubusercontent.com/guanxi660-crypto/nat-ssh-cleanup/main/nat-ssh-cleanup.sh \
-  -o /root/nat-ssh-cleanup.sh && bash /root/nat-ssh-cleanup.sh
-```
 
 清理时会把你所有的公钥列出来，标出哪些有问题，你勾选保留哪几把：
 
